@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Tetris Arena</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0a0a1a;
+      color: #e0e0ff;
+      min-height: 100vh;
+    }
+
+    /* ─── LOGIN ─────────────────────────────────── */
+    #login-page {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: radial-gradient(ellipse at center, #1a0a3a 0%, #0a0a1a 70%);
+    }
+
+    .login-card {
+      background: #13103a;
+      border: 1px solid #2a2560;
+      border-radius: 20px;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    .login-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 2rem;
+    }
+
+    .logo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 3px;
+      width: 36px; height: 36px;
+    }
+    .lb { border-radius: 2px; }
+    .lb1 { background: #e84393; }
+    .lb2 { background: #43c8e8; }
+    .lb3 { background: #f5a623; }
+    .lb4 { background: #7ed321; }
+
+    .login-logo h2 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, #c77dff, #74b9ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .login-card h3 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      color: #e0d8ff;
+    }
+
+    .login-card p {
+      font-size: 0.875rem;
+      color: #6a66a0;
+      margin-bottom: 2rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #9a96c8;
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      background: #0d0a2a;
+      border: 1px solid #2a2560;
+      border-radius: 8px;
+      color: #e0d8ff;
+      padding: 0.75rem 1rem;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+      font-family: inherit;
+    }
+
+    input:focus, textarea:focus {
+      border-color: #6c3de0;
+      box-shadow: 0 0 0 3px rgba(108,61,224,0.15);
+    }
+
+    textarea { resize: vertical; min-height: 80px; }
+
+    .form-group { margin-bottom: 1.25rem; }
+
+    .btn {
+      width: 100%;
+      padding: 0.85rem;
+      border-radius: 10px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #6c3de0, #a855f7);
+      color: white;
+      box-shadow: 0 4px 20px rgba(108,61,224,0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 28px rgba(108,61,224,0.5);
+    }
+
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .error-msg {
+      background: rgba(232,67,147,0.1);
+      border: 1px solid rgba(232,67,147,0.3);
+      color: #e84393;
+      border-radius: 8px;
+      padding: 0.7rem 1rem;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    .success-msg {
+      background: rgba(126,211,33,0.1);
+      border: 1px solid rgba(126,211,33,0.3);
+      color: #7ed321;
+      border-radius: 8px;
+      padding: 0.7rem 1rem;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    /* ─── DASHBOARD ──────────────────────────────── */
+    #dashboard-page { display: none; }
+
+    .top-bar {
+      background: #13103a;
+      border-bottom: 1px solid #2a2560;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .top-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .top-bar-left h1 {
+      font-size: 1.2rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, #c77dff, #74b9ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .top-bar-right { display: flex; align-items: center; gap: 1rem; }
+
+    .badge-admin {
+      background: rgba(108,61,224,0.2);
+      border: 1px solid #6c3de0;
+      color: #c77dff;
+      border-radius: 20px;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .btn-logout {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid #2a2560;
+      color: #9a96c8;
+      border-radius: 8px;
+      padding: 0.4rem 0.9rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-logout:hover { border-color: #e84393; color: #e84393; }
+
+    .dashboard-content {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: 400px 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    @media (max-width: 800px) {
+      .dashboard-content { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: #13103a;
+      border: 1px solid #2a2560;
+      border-radius: 16px;
+      padding: 1.75rem;
+    }
+
+    .panel-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #e0d8ff;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      border: 2px dashed #2a2560;
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .file-input-wrapper:hover { border-color: #6c3de0; }
+    .file-input-wrapper input[type="file"] {
+      position: absolute; inset: 0;
+      opacity: 0; cursor: pointer;
+      border: none; padding: 0;
+    }
+
+    .file-label { color: #6a66a0; font-size: 0.875rem; }
+    .file-label strong { color: #c77dff; }
+
+    #file-preview {
+      margin-top: 0.75rem;
+      border-radius: 8px;
+      max-height: 120px;
+      max-width: 100%;
+      display: none;
+      object-fit: cover;
+    }
+
+    /* competition list */
+    #comp-list { list-style: none; }
+
+    .comp-item {
+      background: #0d0a2a;
+      border: 1px solid #1e1a50;
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      transition: border-color 0.2s;
+    }
+
+    .comp-item:hover { border-color: #3a2a70; }
+
+    .comp-item-name { font-weight: 700; color: #e0d8ff; margin-bottom: 0.25rem; }
+    .comp-item-meta { font-size: 0.8rem; color: #6a66a0; }
+    .comp-item-meta span { margin-right: 0.75rem; }
+
+    .comp-banner-thumb {
+      width: 100%;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-bottom: 0.75rem;
+    }
+
+    .empty-list {
+      text-align: center;
+      padding: 2.5rem;
+      color: #4a4680;
+      font-size: 0.9rem;
+    }
+
+    .section-divider {
+      height: 1px;
+      background: #1e1a50;
+      margin: 1.5rem 0;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner-sm {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="login-page">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-grid">
+        <div class="lb lb1"></div>
+        <div class="lb lb2"></div>
+        <div class="lb lb3"></div>
+        <div class="lb lb4"></div>
+      </div>
+      <h2>Tetris Arena</h2>
+    </div>
+    <h3>Admin Panel</h3>
+    <p>Enter your password to access the dashboard</p>
+    <div class="error-msg" id="login-error"></div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+    <button class="btn btn-primary" id="login-btn" onclick="doLogin()">Sign In</button>
+  </div>
+</div>
+
+<!-- DASHBOARD PAGE -->
+<div id="dashboard-page">
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <div class="logo-grid">
+        <div class="lb lb1"></div>
+        <div class="lb lb2"></div>
+        <div class="lb lb3"></div>
+        <div class="lb lb4"></div>
+      </div>
+      <h1>Admin Dashboard</h1>
+    </div>
+    <div class="top-bar-right">
+      <span class="badge-admin">Administrator</span>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="dashboard-content">
+    <!-- CREATE FORM -->
+    <div class="panel">
+      <div class="panel-title">&#43; Create Competition</div>
+
+      <div class="success-msg" id="form-success"></div>
+      <div class="error-msg" id="form-error"></div>
+
+      <form id="comp-form" enctype="multipart/form-data" onsubmit="createCompetition(event)">
+        <div class="form-group">
+          <label for="c-name">Competition Name *</label>
+          <input id="c-name" name="name" type="text" placeholder="e.g. World Cup 2025" required />
+        </div>
+
+        <div class="form-group">
+          <label for="c-desc">Description</label>
+          <textarea id="c-desc" name="description" placeholder="Brief description of the competition..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="c-rules">Rules</label>
+          <textarea id="c-rules" name="rules" placeholder="Competition rules..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="c-start">Start Date *</label>
+          <input id="c-start" name="start_date" type="date" required />
+        </div>
+
+        <div class="form-group">
+          <label for="c-end">End Date *</label>
+          <input id="c-end" name="end_date" type="date" required />
+        </div>
+
+        <div class="form-group">
+          <label>Banner Image</label>
+          <div class="file-input-wrapper">
+            <input type="file" name="banner" accept="image/*" id="banner-input" onchange="previewFile(this)" />
+            <div class="file-label">
+              <div style="font-size:1.8rem;margin-bottom:0.3rem">🖼️</div>
+              <strong>Click to upload</strong> or drag & drop<br/>
+              <small>PNG, JPG, GIF, WebP — max 5MB</small>
+            </div>
+            <img id="file-preview" alt="Preview" />
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="submit-btn">Create Competition</button>
+      </form>
+    </div>
+
+    <!-- COMPETITIONS LIST -->
+    <div class="panel">
+      <div class="panel-title">&#127942; Competitions</div>
+      <ul id="comp-list">
+        <li class="empty-list">Loading...</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = '/api';
+  let authToken = null;
+
+  function sha256(str) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(str);
+    return crypto.subtle.digest('SHA-256', data).then(buf =>
+      Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('')
+    );
+  }
+
+  async function doLogin() {
+    const pw = document.getElementById('password').value;
+    const btn = document.getElementById('login-btn');
+    const err = document.getElementById('login-error');
+
+    if (!pw) { showError(err, 'Please enter your password'); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-sm"></span>Signing in...';
+    err.style.display = 'none';
+
+    try {
+      const hash = await sha256(pw);
+      const res = await fetch(`${API}/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pw })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        showError(err, data.error || 'Invalid password');
+        return;
+      }
+
+      authToken = data.token;
+      document.getElementById('login-page').style.display = 'none';
+      document.getElementById('dashboard-page').style.display = 'block';
+      loadCompetitions();
+    } catch (e) {
+      showError(err, 'Connection error. Is the server running?');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+    }
+  }
+
+  document.getElementById('password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+
+  function logout() {
+    authToken = null;
+    document.getElementById('dashboard-page').style.display = 'none';
+    document.getElementById('login-page').style.display = 'flex';
+    document.getElementById('password').value = '';
+  }
+
+  function showError(el, msg) {
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  function showSuccess(el, msg) {
+    el.textContent = msg;
+    el.style.display = 'block';
+    setTimeout(() => { el.style.display = 'none'; }, 4000);
+  }
+
+  function previewFile(input) {
+    const preview = document.getElementById('file-preview');
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  async function createCompetition(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submit-btn');
+    const err = document.getElementById('form-error');
+    const suc = document.getElementById('form-success');
+
+    err.style.display = 'none';
+    suc.style.display = 'none';
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-sm"></span>Creating...';
+
+    const form = document.getElementById('comp-form');
+    const formData = new FormData(form);
+
+    try {
+      const res = await fetch(`${API}/competitions`, {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        showError(err, data.error || 'Failed to create competition');
+        return;
+      }
+
+      showSuccess(suc, `Competition "${data.name}" created successfully!`);
+      form.reset();
+      document.getElementById('file-preview').style.display = 'none';
+      loadCompetitions();
+    } catch (ex) {
+      showError(err, 'Network error. Please try again.');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Create Competition';
+    }
+  }
+
+  function formatDate(d) {
+    return new Date(d).toLocaleDateString('es-ES', {
+      day: '2-digit', month: 'short', year: 'numeric'
+    });
+  }
+
+  function getStatus(start, end) {
+    const now = new Date();
+    if (now < new Date(start)) return 'upcoming';
+    if (now > new Date(end)) return 'ended';
+    return 'active';
+  }
+
+  async function loadCompetitions() {
+    const list = document.getElementById('comp-list');
+    try {
+      const res = await fetch(`${API}/competitions`);
+      const data = await res.json();
+
+      if (!data.length) {
+        list.innerHTML = '<li class="empty-list">No competitions yet. Create your first one!</li>';
+        return;
+      }
+
+      list.innerHTML = data.map(c => {
+        const st = getStatus(c.start_date, c.end_date);
+        const colors = { active: '#7ed321', upcoming: '#43c8e8', ended: '#555' };
+        const bannerHtml = c.banner
+          ? `<img class="comp-banner-thumb" src="${c.banner}" alt="Banner"/>`
+          : '';
+        return `
+          <li class="comp-item">
+            ${bannerHtml}
+            <div class="comp-item-name">${c.name}</div>
+            ${c.description ? `<div style="font-size:0.8rem;color:#7a76a8;margin:0.25rem 0 0.5rem;">${c.description}</div>` : ''}
+            <div class="comp-item-meta">
+              <span style="color:${colors[st]};font-weight:700">${st.toUpperCase()}</span>
+              <span>${formatDate(c.start_date)} &rarr; ${formatDate(c.end_date)}</span>
+            </div>
+          </li>`;
+      }).join('');
+    } catch {
+      list.innerHTML = '<li class="empty-list">Could not load competitions.</li>';
+    }
+  }
+</script>
+</body>
+</html>
